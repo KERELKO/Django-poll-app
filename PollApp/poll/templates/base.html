@@ -1,3 +1,4 @@
+{% load django_bootstrap5 %}
 {% load static %}
 
 <!DOCTYPE html>
@@ -6,6 +7,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>{% block title %}{% endblock %}</title>
+	{% bootstrap_css %}
+	{% bootstrap_javascript %}
 </head>
 <body>
 	{% if user.is_authenticated %}
