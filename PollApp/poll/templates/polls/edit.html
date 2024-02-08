@@ -1,0 +1,8 @@
+<form action="" method="post">
+	{{ form.as_p }}
+	{% csrf_token %}
+	{% for name, value in choices.items %}
+		<p><input type="text" name="{{ name }}" value="{{ value }}"></p>
+	{% endfor %}
+	<button type="submit">Save</button>
+</form>

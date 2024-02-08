@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<form method="post" id="form">
+		{{ form.as_p }}
+		{% csrf_token %}
+		<p>Choices:</p>
+		<div id="choiceContainer">
+			<input type="text" name="content-0" class="choice-input" required>
+			<input type="text" name="content-1" class="choice-input" required>
+		</div>	
+		<input type="submit" value="save">
+	</form>
+	<button id="add-choice" type="button">add choice</button>
+{% endblock %}
+
+{% block domready %}
+<script type="text/javascript">
+	var choiceCount = 2;
+	const btn = document.getElementById('add-choice');
+		btn.addEventListener('click', function() {	
+		addChoice();
+		if (choiceCount === 4) {
+			btn.parentNode.removeChild(btn);
+		} else {
+			choiceCount++;
+		};
+	});
+		
+	function addChoice() {
+		let choices = document.getElementById('choiceContainer');
+		let choice = document.createElement('input');
+		choice.name = 'content-' + choiceCount;
+		choice.type = 'text';
+		choice.class = 'choice-input';
+		choice.required = true;
+		choices.appendChild(choice);
+	};
+</script>
+{% endblock %}
