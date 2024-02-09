@@ -1,34 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}{% endblock %}
+{% block title %}Poll{% endblock %}
 
 {% block content %}
-	<p>
-	{{ poll.description }}
-	</p>
-	<h5>Creator: {{ poll.owner }}</h5>
+	<div class="card">
+  	<div class="card-body card-info">
+    	<p>Author: {{ poll.owner }}</p>
+    	<p>Created: {{ poll.created }}</p>
+    	<p>Total votes: {{ poll.total_votes }}</p>
+    	<p>Description: {{ poll.description }}</p>
+  	</div>
+	</div>
 	<form action="{% url 'poll:detail' poll.id %}" method="post">
-	  {% csrf_token %}
-	  <fieldset>
-	    {% for id, choice in choices.items %}
-	      <input type="radio" id="{{ id }}" name="choices" value="{{ id }}" required/> 
-	      <label for="{{ id }}">{{ choice|first }} {{ choice|last }}%</label>	
-	    {% endfor %}
-	  </fieldset>
-		<input type="submit" value="Save choice">
-	</form>
-	{% if request.user == poll.owner %}
-		<div id="options">
-			<button type="button" id="delete-btn">
-				Delete
-			</button>
+		<div class="card">
+			<div class="card-header">
+		  	{{ poll.title }}
+			</div>
+		  	{% csrf_token %}
+		    <ul class="list-group list-group-flush">
+			    {% for id, choice in choices.items %}
+					  <li class="list-group-item">
+					    <div class="form-check form-check-inline">
+				  			<input class="form-check-input" type="radio" name="choices" id="{{ id }}" value="{{ id }}" required>
+				  			<label class="form-check-label" for="{{ id }}">{{ choice|first }}</label>
+							</div>
+						</li>
+			    {% endfor %}
+			  </ul>
 		</div>
-	{% endif %}
+		<div id="options">
+			<button type="submit" class="btn btn-mint">Save choice</button>
+			<a href="{% url 'poll:result' poll.id %}" class="btn btn-mint">Result</a>
+			{% if request.user == poll.owner %}
+				<button type="button" id="delete-btn" class="btn btn-mint">
+					Delete
+				</button>
+			{% endif %}
+		<div id="options">
+	</form>
 {% endblock %}
 
 {% block domready %}
 <script type="text/javascript">
-	
 	const delete_btn = document.getElementById('delete-btn');
 	delete_btn.addEventListener('click', function() {
     // Display a confirmation dialog

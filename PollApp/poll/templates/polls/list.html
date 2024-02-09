@@ -1,8 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-		{% for poll in object_list %}
-			<p><a href="{% url 'poll:detail' poll.id %}">{{ poll.description }}</a></p>
-		{% endfor %}
+	{% for poll in object_list %}
+		<a href="{% url 'poll:detail' poll.id %}" class="card-link">
+			<div class="card">
+			  <h5 class="card-header">{{ poll.title }}</h5>
+			  <div class="card-body">
+			    <p class="card-text">{{ poll.description|truncatechars:200 }}</p>
+			    <p class="card-text">Number of choices: {{ poll.num_choices }}</p>
+			    <p class="card-text">Total votes: {{ poll.total_votes }}</p>
+			  </div>
+			  <div class="card-footer text-muted">
+	    		Created: {{ poll.created }}
+	  		</div>
+			</div>
+		</a>
+	{% endfor %}
 {% endblock %}
 				
