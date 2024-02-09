@@ -8,12 +8,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.db.models import Count
 from .forms import RegistrationForm
 from .models import Poll, Choice
 
 
 class PollListView(ListView):
-	model = Poll 
+	queryset = Poll.objects.annotate(num_choices=Count('choices')) \
+						   .order_by('-created')
 	template_name = 'polls/list.html'
 
 
@@ -110,10 +112,30 @@ class PollDetailView(LoginRequiredMixin, DetailView):
 
 	def post(self, request, pk):
 		choice = get_object_or_404(Choice, id=request.POST['choices'])
-		choice.votes += 1
 		choice.user_votes.add(request.user)
+		choice.votes += 1
 		choice.save()
 		return self.render_to_response({})
+
+
+class PollResultView(View, TemplateResponseMixin):
+	template_name = 'polls/result.html'
+
+	def get(self, request, pk):
+		poll = get_object_or_404(Poll, id=pk)
+		choices = poll.choices.all()
+		poll_result = poll.get_result()
+		context_choices = {}
+		user_choice = None
+		for choice in choices:
+			if request.user in choice.user_votes.all():
+				user_choice = str(choice.id)
+			context_choices[f'{choice.id}'] = [choice.choice, 
+											   poll_result[choice.id]]
+		print(choices, user_choice)
+		return self.render_to_response({'choices': context_choices,
+										'user_choice': user_choice,
+										'poll': poll})
 
 
 class PollDeleteView(OwnerEditMixin, View):
@@ -121,7 +143,7 @@ class PollDeleteView(OwnerEditMixin, View):
 	def get(self, request, pk):
 		poll = get_object_or_404(Poll, id=pk)
 		poll.delete()
-		return redirect('poll:all')
+		return redirect('poll:list')
 
 
 class UserLoginView(LoginView):
@@ -132,7 +154,7 @@ class UserLogout(LoginRequiredMixin, View):
     
     def get(self, request):
         logout(request)
-        return redirect('poll:all')
+        return redirect('poll:list')
 
 
 class UserRegistrationView(View, TemplateResponseMixin):
@@ -148,5 +170,5 @@ class UserRegistrationView(View, TemplateResponseMixin):
 			user = form.save(commit=False)
 			user.set_password(form.cleaned_data['password'])
 			user.save()
-			return redirect('poll:all')
+			return redirect('poll:list')
 		return self.render_to_response({'form': form})

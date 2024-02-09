@@ -126,4 +126,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'poll:login'
 LOGOUT_URL = 'poll:logout'
-LOGIN_REDIRECT_URL = 'poll:all'
+LOGIN_REDIRECT_URL = 'poll:list'

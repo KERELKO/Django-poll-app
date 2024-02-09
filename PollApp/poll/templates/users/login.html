@@ -1,5 +1,13 @@
-<form action="" method="post">
-	{% csrf_token %}
-	{{ form.as_p }}
-	<button type="submit">Save</button>
-</form>
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+	<h5>You need to be logged in to interact with polls.</h5>
+	<form action="" method="post">
+		{% csrf_token %}
+		{% bootstrap_form form %}
+		<button type="submit" class="btn btn-mint">Save</button>
+	</form>
+{% endblock %}

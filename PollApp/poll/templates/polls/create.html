@@ -1,17 +1,24 @@
 {% extends "base.html" %}
+{% load django_bootstrap5 %}
 
 {% block content %}
 	<form method="post" id="form">
-		{{ form.as_p }}
+		{% bootstrap_form form %}
 		{% csrf_token %}
 		<p>Choices:</p>
 		<div id="choiceContainer">
-			<input type="text" name="content-0" class="choice-input" required>
-			<input type="text" name="content-1" class="choice-input" required>
+			<div class="input-group mb-3">
+  			<span class="input-group-text" id="basic-addon1">Choice</span>
+  			<input type="text" class="form-control" name="content-0"required>
+			</div>
+			<div class="input-group mb-3">
+  			<span class="input-group-text" id="basic-addon1">Choice</span>
+  			<input type="text" class="form-control" name="content-1"required>
+			</div>
 		</div>	
-		<input type="submit" value="save">
+		<button type="submit" class="btn btn-mint">Save</button>
+		<button id="add-choice" type="button" class="btn btn-mint">Add choice</button>
 	</form>
-	<button id="add-choice" type="button">add choice</button>
 {% endblock %}
 
 {% block domready %}
@@ -20,21 +27,39 @@
 	const btn = document.getElementById('add-choice');
 		btn.addEventListener('click', function() {	
 		addChoice();
-		if (choiceCount === 4) {
+		if (choiceCount === 5) {
 			btn.parentNode.removeChild(btn);
-		} else {
-			choiceCount++;
 		};
 	});
 		
 	function addChoice() {
-		let choices = document.getElementById('choiceContainer');
-		let choice = document.createElement('input');
-		choice.name = 'content-' + choiceCount;
-		choice.type = 'text';
-		choice.class = 'choice-input';
-		choice.required = true;
-		choices.appendChild(choice);
+    let choicesContainer = document.getElementById('choiceContainer');
+    
+    // Create div for input-group
+    let inputGroupDiv = document.createElement('div');
+    inputGroupDiv.classList.add('input-group', 'mb-3');
+    
+    // Create span for input-group-text
+    let span = document.createElement('span');
+    span.classList.add('input-group-text');
+    span.textContent = 'Choice';
+    
+    // Create input element
+    let input = document.createElement('input');
+    input.type = 'text';
+    input.classList.add('form-control');
+    input.name = 'content-' + choiceCount;
+    input.required = true;
+    
+    // Append span and input to input-group div
+    inputGroupDiv.appendChild(span);
+    inputGroupDiv.appendChild(input);
+    
+    // Append input-group div to choicesContainer
+    choicesContainer.appendChild(inputGroupDiv);
+    
+    // Increment choiceCount for the next input
+    choiceCount++;
 	};
 </script>
 {% endblock %}
