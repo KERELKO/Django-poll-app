@@ -4,19 +4,20 @@ from django.contrib.auth.models import User
 
 class Poll(models.Model):
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
-	description = models.CharField(max_length=400, blank=False)
+	title = models.CharField(max_length=300, blank=False)
+	description = models.TextField(blank=True)
 	created = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		ordering = ['-created']
 
 	def __str__(self):
-		return self.description
+		return self.title
 
 	def get_result(self) -> dict:
 		"""
 		count result of the poll using,
-		simple math formula, before this takes all
+		simple math formula, before this, takes all
 		votes of the choices and compute their sum
 		"""
 		result = {}

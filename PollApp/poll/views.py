@@ -3,35 +3,17 @@ from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import logout
-from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.db.models import Count
-from .forms import RegistrationForm
 from .models import Poll, Choice
+from .mixins import OwnerEditMixin
 
 
 class PollListView(ListView):
 	queryset = Poll.objects.annotate(num_choices=Count('choices')) \
 						   .order_by('-created')
 	template_name = 'polls/list.html'
-
-
-class OwnerQuerySetMixin:
-	def get_queryset(self):
-		qs = super().get_queryset()
-		return qs.filter(owner=self.request.user)
-
-
-class OwnerEditMixin(LoginRequiredMixin, OwnerQuerySetMixin):
-
-	def dispatch(self, request, *args, **kwargs):
-		owner = get_object_or_404(Poll, id=self.kwargs['pk']).owner
-		if owner != self.request.user:
-			return HttpResponse('You don\'t have permissions!')
-		return super().dispatch(request, *args, **kwargs)
 
 
 class PollCreateView(LoginRequiredMixin, CreateView):
@@ -144,31 +126,3 @@ class PollDeleteView(OwnerEditMixin, View):
 		poll = get_object_or_404(Poll, id=pk)
 		poll.delete()
 		return redirect('poll:list')
-
-
-class UserLoginView(LoginView):
-	template_name = 'users/login.html'
-
-
-class UserLogout(LoginRequiredMixin, View):
-    
-    def get(self, request):
-        logout(request)
-        return redirect('poll:list')
-
-
-class UserRegistrationView(View, TemplateResponseMixin):
-	template_name = 'users/registration.html'
-
-	def get(self, request):
-		form = RegistrationForm()
-		return self.render_to_response({'form': form})
-
-	def post(self, request):
-		form = RegistrationForm(data=request.POST)
-		if form.is_valid():
-			user = form.save(commit=False)
-			user.set_password(form.cleaned_data['password'])
-			user.save()
-			return redirect('poll:list')
-		return self.render_to_response({'form': form})
