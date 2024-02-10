@@ -86,6 +86,7 @@ class PollResultView(View, TemplateResponseMixin):
 		choices = poll.choices.all()
 		poll_result = poll.get_result()
 		context_choices = {}
+		selected_choice_id = None
 		for choice in choices:
 			if choice.has_user(request.user):
 				selected_choice_id = choice.id

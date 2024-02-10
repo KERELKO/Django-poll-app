@@ -36,6 +36,9 @@
 			<button type="submit" class="btn btn-mint">Save choice</button>
 			<a href="{% url 'poll:result' poll.id %}" class="btn btn-mint">Result</a>
 			{% if request.user == poll.owner %}
+				<a href="{% url 'poll:edit' poll.id %}" class="btn btn-mint">
+					Edit
+				</a>
 				<button type="button" id="delete-btn" class="btn btn-mint">
 					Delete
 				</button>
