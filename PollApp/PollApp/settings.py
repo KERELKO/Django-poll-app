@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'poll.apps.PollConfig',
+    'users.apps.UsersConfig',
     'django_bootstrap5',
 ]
 
@@ -124,6 +125,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = 'poll:login'
-LOGOUT_URL = 'poll:logout'
+LOGIN_URL = 'users:login'
+LOGOUT_URL = 'users:logout'
 LOGIN_REDIRECT_URL = 'poll:list'

@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from . import auth_views
 
 
 app_name = 'poll'
@@ -18,11 +17,4 @@ urlpatterns = [
 		 name='result'),
 	path('delete/<pk>/', views.PollDeleteView.as_view(),
 		 name='delete'),
-	# auth
-	path('login/', auth_views.UserLoginView.as_view(),
-		 name='login'),
-	path('logout/', auth_views.UserLogout.as_view(),
-      	 name='logout'),
-	path('registration/', auth_views.UserRegistrationView.as_view(),
-		 name='registration'),
 ]

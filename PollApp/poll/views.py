@@ -88,15 +88,15 @@ class PollDetailView(LoginRequiredMixin, DetailView):
 		poll_result = poll.get_result()
 		context['choices'] = {}
 		for choice in choices:
+			# if choice.is_member(self.request.user):
+			# 	user_choice = str(choice.id)
+			# 	context['user_choice'] = user_choice
 			context['choices'][f'{choice.id}'] = [choice.choice, 
 												  poll_result[choice.id]]
 		return context
 
 	def post(self, request, pk):
-		choice = get_object_or_404(Choice, id=request.POST['choices'])
-		choice.user_votes.add(request.user)
-		choice.votes += 1
-		choice.save()
+		print(request.POST)
 		return self.render_to_response({})
 
 
@@ -110,11 +110,10 @@ class PollResultView(View, TemplateResponseMixin):
 		context_choices = {}
 		user_choice = None
 		for choice in choices:
-			if request.user in choice.user_votes.all():
-				user_choice = str(choice.id)
+			# if choice.is_member(request.user):
+			# 	user_choice = str(choice.id)
 			context_choices[f'{choice.id}'] = [choice.choice, 
 											   poll_result[choice.id]]
-		print(choices, user_choice)
 		return self.render_to_response({'choices': context_choices,
 										'user_choice': user_choice,
 										'poll': poll})
