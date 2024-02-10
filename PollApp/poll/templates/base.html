@@ -24,6 +24,13 @@
 		{% endif %}
 	</ul>
 	<div class="container">
+		{% if messages %}
+			{% for message in messages %}
+				<div class="alert alert-success" role="alert">
+  				{{ message }}
+				</div>
+			{% endfor %}
+		{% endif %}
 		{% block content %}
 		{% endblock %}
 	</div>

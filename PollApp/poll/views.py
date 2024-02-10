@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.db.models import Count
+from django.contrib import messages
 from .models import Poll, Choice
 from .mixins import OwnerEditMixin
 
@@ -75,6 +76,7 @@ class PollDetailView(LoginRequiredMixin, DetailView):
 		choice_id = int(request.POST.get('choices'))
 		selected_choice = get_object_or_404(Choice, id=choice_id)
 		poll.change_vote(selected_choice, user)
+		messages.success(request, 'Vote counted!')
 		return redirect('poll:detail', pk=pk)
 
 
