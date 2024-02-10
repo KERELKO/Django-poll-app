@@ -7,7 +7,7 @@
 	<h3>
 		Register of a new account
 	</h3>
-	<form action="{% url 'poll:registration' %}" method="post">
+	<form action="{% url 'users:registration' %}" method="post">
 		{% csrf_token %}
 		{% bootstrap_form form %}
 			<button type="submit" class="btn btn-mint">Create account</button>

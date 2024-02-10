@@ -19,7 +19,7 @@ class PollListView(ListView):
 class PollCreateView(LoginRequiredMixin, CreateView):
 	model = Poll
 	template_name = 'polls/create.html'
-	fields = ['description']
+	fields = ['title', 'description']
 
 	def get_success_url(self):
 		success_url = reverse_lazy('poll:detail', 
@@ -45,30 +45,12 @@ class PollEditView(OwnerEditMixin, UpdateView):
 	model = Poll
 	template_name = 'polls/edit.html'
 	context_object_name = 'poll'
-	fields = ['description']
+	fields = ['title', 'description']
 	
 	def get_success_url(self):
 		success_url = reverse_lazy('poll:detail', 
 									kwargs={'pk': self.object.id})
 		return success_url
-
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		poll = self.object
-		choices = poll.choices.all()
-		context['choices'] = {}
-		for choice in choices:
-			context['choices'][f'{choice.id}'] = choice.choice
-		return context
-
-	def form_valid(self, form):
-		response = super().form_valid(form)
-		poll = self.object
-		for choice in poll.choices.all():
-			if str(choice.id) in self.request.POST:
-				choice.choice = self.request.POST[f'{choice.id}']
-				choice.save()
-		return response
 
 
 class PollDetailView(LoginRequiredMixin, DetailView):
@@ -76,28 +58,24 @@ class PollDetailView(LoginRequiredMixin, DetailView):
 	context_object_name = 'poll'
 	template_name = 'polls/detail.html'
 
-	def dispatch(self, request, *args, **kwargs):
-		if request.method == 'POST':
-			self.template_name = 'polls/detail_done.html'
-		return super().dispatch(request, *args, **kwargs)
-
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		poll = self.object
 		choices = poll.choices.all()
-		poll_result = poll.get_result()
 		context['choices'] = {}
 		for choice in choices:
-			# if choice.is_member(self.request.user):
-			# 	user_choice = str(choice.id)
-			# 	context['user_choice'] = user_choice
-			context['choices'][f'{choice.id}'] = [choice.choice, 
-												  poll_result[choice.id]]
+			if choice.has_user(self.request.user):
+				context['selected_choice_id'] = choice.id
+			context['choices'][choice.id] = [choice.choice]
 		return context
 
 	def post(self, request, pk):
-		print(request.POST)
-		return self.render_to_response({})
+		user = request.user 
+		poll = get_object_or_404(Poll, id=pk)
+		choice_id = int(request.POST.get('choices'))
+		selected_choice = get_object_or_404(Choice, id=choice_id)
+		poll.change_vote(selected_choice, user)
+		return redirect('poll:detail', pk=pk)
 
 
 class PollResultView(View, TemplateResponseMixin):
@@ -108,15 +86,15 @@ class PollResultView(View, TemplateResponseMixin):
 		choices = poll.choices.all()
 		poll_result = poll.get_result()
 		context_choices = {}
-		user_choice = None
 		for choice in choices:
-			# if choice.is_member(request.user):
-			# 	user_choice = str(choice.id)
-			context_choices[f'{choice.id}'] = [choice.choice, 
-											   poll_result[choice.id]]
-		return self.render_to_response({'choices': context_choices,
-										'user_choice': user_choice,
-										'poll': poll})
+			if choice.has_user(request.user):
+				selected_choice_id = choice.id
+			context_choices[choice.id] = [choice.choice, 
+									      poll_result[choice.id]]
+		context = {'choices': context_choices,
+				   'poll': poll,
+				   'selected_choice_id': selected_choice_id}
+		return self.render_to_response(context)
 
 
 class PollDeleteView(OwnerEditMixin, View):

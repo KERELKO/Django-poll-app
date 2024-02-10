@@ -4,7 +4,7 @@ from .models import Poll, Choice
 
 @admin.register(Poll)
 class PollAdmin(admin.ModelAdmin):
-	fields = ['owner', 'description']
+	fields = ['owner', 'title', 'description']
 
 
 @admin.register(Choice)

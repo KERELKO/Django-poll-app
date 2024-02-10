@@ -2,7 +2,7 @@ from django.views.generic.base import TemplateResponseMixin
 from django.views.generic import View
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login
 from django.shortcuts import redirect
 from .forms import RegistrationForm
 
@@ -31,5 +31,6 @@ class UserRegistrationView(View, TemplateResponseMixin):
 			user = form.save(commit=False)
 			user.set_password(form.cleaned_data['password'])
 			user.save()
+			login(request, user)
 			return redirect('poll:list')
 		return self.render_to_response({'form': form})

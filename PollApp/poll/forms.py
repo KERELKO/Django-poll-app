@@ -11,4 +11,5 @@ class ChoiceForm(forms.ModelForm):
 class PollForm(forms.ModelForm):
 	class Meta:
 		model = Poll 
-		fields = ['title', 'description']
+		fields = '__all__'
+		exclude = ['created', 'owner']

@@ -8,7 +8,9 @@
     	<p>Author: {{ poll.owner }}</p>
     	<p>Created: {{ poll.created }}</p>
     	<p>Total votes: {{ poll.total_votes }}</p>
-    	<p>Description: {{ poll.description }}</p>
+    	{% if poll.description %}
+    		<p>Description: {{ poll.description }}</p>
+    	{% endif %}
   	</div>
 	</div>
 	<form action="{% url 'poll:detail' poll.id %}" method="post">
@@ -21,7 +23,9 @@
 			    {% for id, choice in choices.items %}
 					  <li class="list-group-item">
 					    <div class="form-check form-check-inline">
-				  			<input class="form-check-input" type="radio" name="choices" id="{{ id }}" value="{{ id }}" required>
+
+				  			<input class="form-check-input" type="radio" name="choices" id="{{ id }}" value="{{ id }}" 
+				  			{% if selected_choice_id == id %}checked{% else %}required{% endif %}>
 				  			<label class="form-check-label" for="{{ id }}">{{ choice|first }}</label>
 							</div>
 						</li>
