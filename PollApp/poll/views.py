@@ -53,7 +53,7 @@ class PollEditView(OwnerEditMixin, UpdateView):
 	def get_success_url(self):
 		success_url = reverse_lazy(
 			'poll:detail', 
-			kwargs={'pk': self.object.id}
+			kwargs={'pk': self.pk}
 		)
 		return success_url
 
@@ -84,7 +84,7 @@ class PollDetailView(LoginRequiredMixin, DetailView):
 		return redirect('poll:detail', pk=pk)
 
 
-class PollResultView(View, TemplateResponseMixin):
+class PollResultView(TemplateResponseMixin, View):
 	template_name = 'polls/result.html'
 
 	def get(self, request, pk):
@@ -109,8 +109,13 @@ class PollResultView(View, TemplateResponseMixin):
 
 
 class PollDeleteView(OwnerEditMixin, View):
+	model = Poll
 
-	def get(self, request, pk):
+	def dispatch(self, request, pk, *args, **kwargs):
+		super().dispatch(request, pk, *args, **kwargs)
+		return self.delete(request, pk)
+
+	def delete(self, request, pk):
 		poll = get_object_or_404(Poll, id=pk)
 		poll.delete()
 		return redirect('poll:list')
