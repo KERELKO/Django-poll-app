@@ -24,8 +24,10 @@ class OwnerEditMixin(LoginRequiredMixin, OwnerQuerySetMixin):
 		return self.model
 
 	def dispatch(self, request, *args, **kwargs):
-		owner = get_object_or_404(self.get_model(),
-								  id=self.kwargs['pk']).owner
+		owner = get_object_or_404(
+			self.get_model(),
+			id=self.kwargs['pk']
+		).owner
 		if owner != self.request.user:
 			return HttpResponse('You don\'t have permissions!')
 		return super().dispatch(request, *args, **kwargs)

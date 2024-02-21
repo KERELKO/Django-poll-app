@@ -50,7 +50,7 @@ class Poll(models.Model):
 		methods of the Choice  
 		"""
 		for choice in self.choices.all():
-			if choice.has_user(user) and choice.id != selected_choice.id:
+			if choice.has_user(user) and choice != selected_choice:
 				choice.remove_user(user)
 				break
 		if not selected_choice.has_user(user):
@@ -58,9 +58,15 @@ class Poll(models.Model):
 
 
 class Choice(models.Model):
-	poll = models.ForeignKey(Poll, on_delete=models.CASCADE,
-							 	   related_name='choices')
-	user_votes = models.ManyToManyField(User, related_name='voted_for')
+	poll = models.ForeignKey(
+		Poll, 
+		on_delete=models.CASCADE,
+		related_name='choices'
+	)
+	user_votes = models.ManyToManyField(
+		User, 
+		related_name='voted_for'
+	)
 	choice = models.CharField(max_length=200)
 	votes = models.PositiveIntegerField(default=0)
 

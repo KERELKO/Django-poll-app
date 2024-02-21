@@ -7,13 +7,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.db.models import Count
 from django.contrib import messages
+
 from .models import Poll, Choice
 from .mixins import OwnerEditMixin
 
 
 class PollListView(ListView):
-	queryset = Poll.objects.annotate(num_choices=Count('choices')) \
-						   .order_by('-created')
+	queryset = Poll.objects.annotate(
+		num_choices=Count('choices')
+	).order_by('-created')
 	template_name = 'polls/list.html'
 
 
@@ -23,22 +25,22 @@ class PollCreateView(LoginRequiredMixin, CreateView):
 	fields = ['title', 'description']
 
 	def get_success_url(self):
-		success_url = reverse_lazy('poll:detail', 
-									kwargs={'pk': self.object.id})
+		success_url = reverse_lazy(
+			'poll:detail', 
+			kwargs={'pk': self.object.id}
+		)
 		return success_url
 
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		return context
-	
 	def form_valid(self, form):
 		form.instance.owner = self.request.user 
 		response = super().form_valid(form)
 		for i in range(5):	
 			choice = f'content-{i}'
 			if choice in self.request.POST:
-				Choice.objects.create(poll=self.object, 
-									  choice=self.request.POST[choice])	
+				Choice.objects.create(
+					poll=self.object, 
+					choice=self.request.POST[choice]
+				)	
 		return response 
 
 
@@ -49,8 +51,10 @@ class PollEditView(OwnerEditMixin, UpdateView):
 	fields = ['title', 'description']
 	
 	def get_success_url(self):
-		success_url = reverse_lazy('poll:detail', 
-									kwargs={'pk': self.object.id})
+		success_url = reverse_lazy(
+			'poll:detail', 
+			kwargs={'pk': self.object.id}
+		)
 		return success_url
 
 
@@ -92,11 +96,15 @@ class PollResultView(View, TemplateResponseMixin):
 		for choice in choices:
 			if choice.has_user(request.user):
 				selected_choice_id = choice.id
-			context_choices[choice.id] = [choice.choice, 
-									      poll_result[choice.id]]
-		context = {'choices': context_choices,
-				   'poll': poll,
-				   'selected_choice_id': selected_choice_id}
+			context_choices[choice.id] = [
+				choice.choice, 
+				poll_result[choice.id]
+			]
+		context = {
+			'choices': context_choices,
+			'poll': poll,
+			'selected_choice_id': selected_choice_id
+		}
 		return self.render_to_response(context)
 
 
