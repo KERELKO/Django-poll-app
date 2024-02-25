@@ -16,7 +16,8 @@ class OwnerQuerySetMixin:
 class OwnerEditMixin(
 	LoginRequiredMixin, 
 	OwnerQuerySetMixin,
-	SingleObjectMixin):
+	SingleObjectMixin
+):
 	"""
 	Prevent user which is not owner of the instance
 	to edit the instance
@@ -24,7 +25,7 @@ class OwnerEditMixin(
 	model = None
 
 	def dispatch(self, request, pk, *args, **kwargs):
-		owner =self.get_object().owner
+		owner = self.get_object().owner
 		if owner != self.request.user:
 			return HttpResponse('You don\'t have permissions!')
 		return super().dispatch(request, *args, **kwargs)
