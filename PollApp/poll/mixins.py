@@ -24,7 +24,7 @@ class OwnerEditMixin(
 	"""
 	model = None
 
-	def dispatch(self, request, pk, *args, **kwargs):
+	def dispatch(self, request, *args, **kwargs):
 		owner = self.get_object().owner
 		if owner != self.request.user:
 			return HttpResponse('You don\'t have permissions!')

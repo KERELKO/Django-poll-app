@@ -68,18 +68,18 @@ class PollDetailView(LoginRequiredMixin, DetailView):
 		poll = self.object
 		choices = poll.choices.all()
 		context['choices'] = {}
-		for choice in choices:
-			if choice.has_user(self.request.user):
-				context['selected_choice_id'] = choice.id
-			context['choices'][choice.id] = [choice.choice]
+		user_choice = self.request.user.get_selected_choice(choices)
+		if user_choice:
+			context['selected_choice_id'] = user_choice.id
+		context['choices'] = {choice.id: choice.choice for choice in choices}
+		print(context)
 		return context
 
-	def post(self, request, pk):
-		user = request.user 
+	def post(self, request, pk): 
 		poll = get_object_or_404(Poll, id=pk)
 		choice_id = int(request.POST.get('choices'))
 		selected_choice = get_object_or_404(Choice, id=choice_id)
-		poll.change_vote(selected_choice, user)
+		poll.change_vote(selected_choice, request.user)
 		messages.success(request, 'Vote counted!')
 		return redirect('poll:detail', pk=pk)
 

@@ -4,9 +4,9 @@ from .models import Poll, Choice
 
 @admin.register(Poll)
 class PollAdmin(admin.ModelAdmin):
-	fields = ['owner', 'title', 'description']
+	list_display = ['owner', 'title', 'description']
 
 
 @admin.register(Choice)
 class ChoiceAdmin(admin.ModelAdmin):
-	fields = ['choice', 'poll', 'votes']
+	list_display = ['choice', 'poll', 'votes']

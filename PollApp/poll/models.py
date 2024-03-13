@@ -1,11 +1,12 @@
 from typing import Type  
 from django.db import models
-from django.contrib.auth.models import User
+from django.db.models import Sum
+from django.conf import settings 
 
 
 class Poll(models.Model):
 	owner = models.ForeignKey(
-		User, 
+		settings.AUTH_USER_MODEL, 
 		on_delete=models.CASCADE
 	)
 	title = models.CharField(max_length=300, blank=False)
@@ -36,28 +37,25 @@ class Poll(models.Model):
 
 	def total_votes(self, queryset=None) -> int:
 		"""Return total count of votes for the poll"""
-		total = 0
 		if not queryset:
 			queryset = self.choices.all()
-		for choice in queryset:
-			total += choice.votes
-		return total 
+		queryset = queryset.aggregate(total_votes=Sum('votes'))
+		return queryset.get('total_votes', 0)
 
-	def change_vote(self,  
-		selected_choice: Type['Choice'],
-		user: Type['User']
+	def update_vote(self,  
+		user: Type['User'],
+		selected_choice: int,
 	) -> None:
+		""" 
+		Updates user vote for the poll
 		"""
-		Change user's vote for the poll, 
-		using 'add_user' and 'remove_user' 
-		methods of the Choice  
-		"""
-		for choice in self.choices.all():
-			if choice.has_user(user) and choice != selected_choice:
-				choice.remove_user(user)
-				break
-		if not selected_choice.has_user(user):
-			selected_choice.add_user(user)
+		choices = self.choices.all()
+		user_choice = user.get_selected_choice(choices)
+		if user_choice:
+			user_choice.decrease_votes()
+			user.remove_choice(user_choice)	
+		user.add_choice(selected_choice)
+		selected_choice.increase_votes()
 
 
 class Choice(models.Model):
@@ -66,34 +64,18 @@ class Choice(models.Model):
 		on_delete=models.CASCADE,
 		related_name='choices'
 	)
-	user_votes = models.ManyToManyField(
-		User, 
-		related_name='voted_for'
-	)
 	choice = models.CharField(max_length=200)
 	votes = models.PositiveIntegerField(default=0)
 
 	def __str__(self):
 		return self.choice
 
-	def add_user(self, user: Type['User']) -> None:
-		"""
-		Add user to the 'user_votes' field,
-		also increase votes field by 1
-		"""
-		self.user_votes.add(user)
+	def increase_votes(self) -> None:
+		""" increases 'votes' by 1"""
 		self.votes += 1
 		self.save()
 
-	def remove_user(self, user: Type['User']) -> None:
-		"""
-		Remove user from the 'user_votes' field,
-		also decrease votes field by 1
-		"""
+	def decrease_votes(self) -> None:
+		"""decrease 'votes' by 1"""
 		self.votes -= 1
-		self.user_votes.remove(user)
 		self.save()
-
-	def has_user(self, user: Type['User']) -> bool:
-		"""Check if the user has already voted"""
-		return user in self.user_votes.all()
