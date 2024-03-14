@@ -23,10 +23,9 @@
 			    {% for id, choice in choices.items %}
 					  <li class="list-group-item">
 					    <div class="form-check form-check-inline">
-
 				  			<input class="form-check-input" type="radio" name="choices" id="{{ id }}" value="{{ id }}" 
 				  			{% if selected_choice_id == id %}checked{% else %}required{% endif %}>
-				  			<label class="form-check-label" for="{{ id }}">{{ choice|first }}</label>
+				  			<label class="form-check-label" for="{{ id }}">{{ choice }}</label>
 							</div>
 						</li>
 			    {% endfor %}
