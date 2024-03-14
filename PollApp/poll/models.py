@@ -19,7 +19,7 @@ class Poll(models.Model):
 	def __str__(self):
 		return self.title
 
-	def get_result(self) -> dict[int, float]:
+	def get_result(self) -> dict['Choice', float]:
 		"""
 		Computes the result of the poll as a percentage for each choice.
 		
@@ -28,21 +28,17 @@ class Poll(models.Model):
 		multiplied by 100. The result is rounded to two decimal places.
 		
 		Returns:
-			A dictionary where the keys are the IDs of the choices and the values
+			A dictionary where the keys are the choice instances and the values
 			are the percentage of votes each choice received.
 		"""
 		result = {}
 		choices = self.choices.all()
 		for choice in choices:
 			if not choice.votes or not self.votes:
-				result[choice.id] = 0
-				continue
-			result[choice.id] = round((choice.votes / self.votes) * 100, 2)
+				result[choice] = 0
+			else:
+				result[choice] = round((choice.votes / self.votes) * 100, 2)
 		return result
-
-	def total_votes(self) -> int:
-		"""Returns total count of votes for the poll"""
-		return self.votes
 
 	def increase_votes(self):
 		"""Increases 'votes' by 1"""

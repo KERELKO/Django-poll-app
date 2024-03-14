@@ -19,12 +19,15 @@ class CustomUser(AbstractUser):
 		otherwise returns None or raises the exception,
 		because user can have only one selected choice in a queryset
 		"""
-		selected_choices = self.choices.filter(id__in=queryset.values('id'))
-		if len(selected_choices) == 1:
-			return selected_choices.first()
-		if len(selected_choices) >= 2:
-			raise MultipleObjectsReturned('User cannot have two or more selected choices in a queryset')
-		return None
+		# selected_choices = self.choices.filter(id__in=queryset.values('id'))
+		# if len(selected_choices) == 1:
+		# 	return selected_choices.first()
+		# if len(selected_choices) >= 2:
+		# 	raise MultipleObjectsReturned('User cannot have two or more selected choices in a queryset')
+		# return None
+		selected_choice = self.choices.filter(id__in=queryset.values('id')).first()
+		print(selected_choice)
+		return selected_choice
 
 	def remove_choice(self, choice: Type['Choice']) -> None:
 		"""Removes choice from the 'choices'"""

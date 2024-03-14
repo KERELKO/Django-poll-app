@@ -8,7 +8,7 @@
 			  <div class="card-body">
 			    <p class="card-text">{{ poll.description|truncatechars:200 }}</p>
 			    <p class="card-text">Number of choices: {{ poll.num_choices }}</p>
-			    <p class="card-text">Total votes: {{ poll.total_votes }}</p>
+			    <p class="card-text">Total votes: {{ poll.votes }}</p>
 			  </div>
 			  <div class="card-footer text-muted">
 	    		Created: {{ poll.created }}
