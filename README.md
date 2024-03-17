@@ -9,7 +9,7 @@
 1. [Django](https://www.djangoproject.com/)
 2. [Bootstrap](https://getbootstrap.com/docs/5.0/getting-started/introduction/)
 
-## How to install
+## How to use
 You can simply install the project by  
 `git clone https://github.com/KERELKO/Django-poll-app`  
 install dependencies in your virtual environment  
