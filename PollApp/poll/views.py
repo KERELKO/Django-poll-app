@@ -71,8 +71,8 @@ class PollDetailView(LoginRequiredMixin, TemplateResponseMixin, View):
 		return Poll.objects.select_related('owner').get(id=pk)
 
 	def get_selected_choice(
-		self, user: Type['User'], queryset: Type['QuerySet']
-	) -> Optional[Type['Choice']]:
+		self, user: 'User', queryset: 'QuerySet'
+	) -> Optional[Choice]:
 		"""Returns previously selected choice by the user"""
 		return user.get_selected_choice(queryset)
 
