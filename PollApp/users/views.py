@@ -13,7 +13,6 @@ class UserLoginView(LoginView):
 
 
 class UserLogout(LoginRequiredMixin, View):
-
     def get(self, request):
         logout(request)
         return redirect('poll:list')
